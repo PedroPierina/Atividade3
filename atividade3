@@ -1,66 +1,231 @@
+#define _CRT_SECURE_NO_WARNINGS
+#define NULL 0
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-
-struct aluno{
-	int ra;
+/*===============================================================================================================
+---------------------------------------------DECLARAÇÃO DE TUDO-------------------------------------------------
+=================================================================================================================*/
+struct tipo_aluno {
 	char nome[50];
+	int ra;
 	float nota;
-	struct aluno *prox;
+	struct tipo_aluno *prox;
 };
 
-void opcao1();
-void opcao2();
-void opcao3();
-void opcao4();
-void opcao5();
+//NOVA COISA NA LISTA
+struct tipo_aluno *criar();
 
-int main(){
-	struct aluno *pessoa;
-	int opcao = -1;
+//CRIA LISTA VAZIA
+void cria_vazia(struct tipo_aluno **lista);
+
+//NOVO ALUNO
+void novo_al(struct tipo_aluno **lista, struct tipo_aluno *novo);
+
+//EXIBE TODOS OS ALUNOS
+void exibir(struct tipo_aluno *lista);
+
+//BUSCA NA LISTA
+void busca(struct tipo_aluno *aux, int tipo);
 
 
-	while(opcao != 0){
-		printf("             ---------------------------------\n");
-		printf("             |              Menu             |\n");
-		printf("             |1- Inserir cadastro do aluno   |\n");
-		printf("             |2- Remover cadastro do aluno   |\n");
-		printf("             |3- Buscar aluno por RA         |\n");
-		printf("             |4- Buscar aluno por Nome       |\n");
-		printf("             |5- Exibir dados de todos alunos|\n");
-		printf("             |0- Sair                        |\n");
-		printf("             ---------------------------------\n");
+/*===============================================================================================================
+------------------------------------------------------MAIN-------------------------------------------------------
+=================================================================================================================*/
+int main() {
+	struct tipo_aluno *aluno;
+	int opcao = 9;
+
+	//Seta a lista para vazia
+	cria_vazia(&aluno);
+
+	//Loop de opções
+	while (opcao != 0) {
+		printf("                                       MENU\n");
+		printf("                         1- Inserir o cadastro de um aluno\n");
+		printf("                         2- Remover o cadastro de um aluno\n");
+		printf("                         3- Buscar aluno por RA\n");
+		printf("                         4- Buscar aluno por Nome\n");
+		printf("                         5- Exibir dados de todos os alunos cadastrados\n");
+		printf("                         0- Sair\n");
 
 		scanf("%i", &opcao);
 
-		switch(opcao){
+		system("cls");
+
+		switch (opcao) {
+		//Caso seja cadastro
 		case 1:
-			opcao1();
-		break;
+			novo_al(&aluno, criar());
+			break;
 
+		//Caso seja remoção
 		case 2:
-			opcao2();
-		break;
-
+			break;
+		//Buscar aluno por RA
 		case 3:
-			opcao3();
-		break;
-
+			busca(aluno, 1);
+			break;
+		//Buscar aluno por Nome
 		case 4:
-			opcao4();
-		break;
-
+			busca(aluno, 2);
+			break;
+		//Exibir todos
 		case 5:
-			opcao5();
-		break;
-
+			exibir(aluno);
+			system("pause");
+			break;
+		//Sair
 		case 0:
-		break;
-
+			break;
+		//Nenhuma das anteriores
 		default:
-			printf("Opção Inválida.\n");
+			printf("Opcao invalida!\n");
 			break;
 		}
+
+		system("cls");
 	}
+	
 	return 0;
+}
+
+/*===============================================================================================================
+-------------------------------------------CRIA NOVO INDIV. NA LISTA--------------------------------------------
+=================================================================================================================*/
+struct tipo_aluno *criar() {
+	struct tipo_aluno *novo;
+
+	//Aloca espaço na memória
+	novo = (struct tipo_aluno *)malloc(sizeof(struct tipo_aluno));
+
+	//Nome
+	printf("Nome: ");
+	scanf("%s", &novo->nome);
+
+	//RA
+	printf("RA: ");
+	scanf("%i", &novo->ra);
+
+	//Nota
+	printf("Nota: ");
+	scanf("%f", &novo->nota);
+
+	//Seta o ponteiro para o proximo argumento como NULO
+	novo->prox = NULL;
+
+	return novo;
+}
+
+/*===============================================================================================================
+-------------------------------------------INICIA LISTA COMO VAZIA-----------------------------------------------
+=================================================================================================================*/
+void cria_vazia(struct tipo_aluno **lista) {
+	//Lista é Nula
+	*lista = NULL;
+}
+
+/*===============================================================================================================
+--------------------------------------------CADASTRANDO NOVO ALUNO-----------------------------------------------
+=================================================================================================================*/
+void novo_al(struct tipo_aluno **lista, struct tipo_aluno *novo) {
+	struct tipo_aluno *aux;
+
+	//Se o ponteiro não for NULL
+	if (*lista) {
+		aux = *lista;
+		//enquanto existir proximo da lista
+		while (aux->prox) {
+			//avança
+			aux = aux->prox;
+		}
+		//Se chegar no final da lista
+		aux->prox = novo;
+	}
+	else {
+		//Se for NULL, cria 1 item da lista
+		*lista = novo;
+	}
+
+}
+
+/*===============================================================================================================
+--------------------------------------------EXIBE TODA A LISTA---------------------------------------------------
+=================================================================================================================*/
+void exibir(struct tipo_aluno *lista) {
+	//Se existir o ponteiro
+	if (lista) {
+		//Enquanto ele for diferente de NULL
+		while (lista) {
+			//Exibe todos os dados
+			printf("Nome:\t %s\n", lista->nome);
+			printf("RA: \t %i\n", lista->ra);
+			printf("Nota:\t %.2f\n", lista->nota);
+			printf("----------------------------------------------\n");
+			//Avança
+			lista = lista->prox;
+		}
+	}
+}
+
+/*===============================================================================================================
+--------------------------------------------EXIBE 1 ALUNO POR RA OU NOME-----------------------------------------
+=================================================================================================================*/
+void busca(struct tipo_aluno *aux, int tipo) {
+	int ra;
+	char nome[50];
+
+	/*
+	Tipo 1 -> Busca por RA
+	Tipo 2 -> Busca por Nome
+	*/
+
+	switch (tipo) {
+	case 1:
+		printf("RA: ");
+		scanf("%i", &ra);
+
+		//Ve se o ponteiro é nulo
+		while (aux) {
+			//Compara com o RA que ele quer
+			if (aux->ra == ra) {
+				system("cls");
+				printf("Nome:\t %s\n", aux->nome);
+				printf("RA:\t %i\n", aux->ra);
+				printf("Nota:\t %.2f\n", aux->nota);
+				system("pause");
+				break;
+			}
+			//Caso não tenha o RA, avança na lista
+			else {
+				aux = aux->prox;
+			}
+		}
+
+		break;
+
+	case 2:
+		printf("Nome: ");
+		scanf("%s", &nome);
+
+		//Ve se o ponteiro é nulo
+		while (aux) {
+			//Compara com o Nome que ele quer
+			if (strcmp(aux->nome, nome) == 0) {
+				system("cls");
+				printf("Nome:\t %s\n", aux->nome);
+				printf("RA:\t %i\n", aux->ra);
+				printf("Nota:\t %.2f\n", aux->nota);
+				system("pause");
+				break;
+			}
+			//Se não for igual, avança na lista
+			else {
+				aux = aux->prox;
+			}
+		}
+
+		break;
+	}
 }
